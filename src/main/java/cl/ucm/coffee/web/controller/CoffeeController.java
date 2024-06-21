@@ -1,96 +1,99 @@
 package cl.ucm.coffee.web.controller;
 
 import cl.ucm.coffee.persitence.entity.CoffeeEntity;
-import cl.ucm.coffee.persitence.repository.CoffeeRepository;
+import cl.ucm.coffee.service.CoffeeService;
+import cl.ucm.coffee.service.ICoffeeService;
+import com.fasterxml.jackson.databind.ser.Serializers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/coffee")
 public class CoffeeController {
 
     @Autowired
-    private CoffeeRepository coffeeRepository;
+    private ICoffeeService coffeeService;
 
-    //Crear nuevo café
-    @PostMapping("/create")
-    public ResponseEntity<?> create(
-            @RequestParam(name = "name") String name,
-            @RequestParam(name = "price") int price,
-            @RequestParam(name = "desc") String description,
-            @RequestParam(name = "foto") MultipartFile foto) {
+    //Buscar café
+    @GetMapping("/search")
+    public ResponseEntity<?> findByName(@RequestParam(name = "name") String name){
         try {
-            CoffeeEntity newCoffee = new CoffeeEntity();
-            newCoffee.setName(name);
-            newCoffee.setPrice(price);
-            newCoffee.setDescription(description);
-            newCoffee.setImage64(Base64.getEncoder(), encodeToString(foto.getBytes()));
-
-            coffeeRepository.save(newCoffee);
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Café creado exitosamente");
-            return ResponseEntity.ok(response);
+            List<CoffeeEntity> coffees = coffeeService.findByName(name);
+            return ResponseEntity.ok(coffees);
         } catch (Exception e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Error al crear el café");
-            return ResponseEntity.status(500).body(response);
-        }
-
-    }
-
-    //Buscar café por nombre
-    @GetMapping("/findByName")
-    public ResponseEntity<?> findByName(@RequestParam(name = "name") String name) {
-        Optional<CoffeeEntity> coffee = coffeeRepository.findByName(name);
-        if (coffee.isPresent()) {
-            return ResponseEntity.ok(coffee.get());
-        } else {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Café no encontrado");
-            return ResponseEntity.status(404).body(response);
+            return ResponseEntity.status(404).build();
         }
     }
 
     //Listar todos los cafés
     @GetMapping("/list")
-    public ResponseEntity<?> coffeeList() {
-        return ResponseEntity.ok(coffeeRepository.findAll());
+    public ResponseEntity<List<CoffeeEntity>> coffeeList() {
+        List<CoffeeEntity> coffees = coffeeService.coffeeList();
+        return ResponseEntity.ok(coffees);
+    }
+
+    //@PostMapping("/save")
+    //public ResponseEntity<CoffeeEntity> saveCoffee(@RequestBody CoffeeEntity coffeeEntity) {
+        //CoffeeEntity savedCoffee = coffeeService.saveCoffee(coffeeEntity);
+        //return ResponseEntity.ok(savedCoffee);
+    //}
+
+    @PostMapping("/coffees")
+    public ResponseEntity<?> saveCoffees(@RequestParam(name="name") String name,
+                                         @RequestParam(name = "price") Integer price,
+                                         @RequestParam(name = "desc") String description,
+                                         @RequestParam(name = "image64") MultipartFile image64){
+        try {
+            CoffeeEntity coffeeEntity = new CoffeeEntity();
+            coffeeEntity.setName(name);
+            coffeeEntity.setPrice(price);
+            coffeeEntity.setDescription(description);
+            coffeeEntity.setImage64(Base64.getEncoder().encodeToString(image64.getBytes()));
+
+            CoffeeEntity savedCoffee = coffeeService.saveCoffee(coffeeEntity);
+            return ResponseEntity.ok(savedCoffee);
+        } catch (Exception e) {
+            return ResponseEntity.status(404).build();
+        }
     }
 
     //Actualizar un café
-    @PutMapping("/updateCoffee")
-    public ResponseEntity<?> updateCoffee(@RequestBody CoffeeEntity coffeeEntity) {
-        if (coffeeRepository.existsById(coffeeEntity.getIdCoffee())) {
-            coffeeRepository.save(coffeeEntity);
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Café actualizado");
-            return ResponseEntity.ok(response);
-        } else {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Café no encontrado");
-            return ResponseEntity.status(404).body(response);
+    @PutMapping("/coffee/updateCoffee")
+    public ResponseEntity<?> updateCoffee(@RequestParam(name = "id_coffee") Integer id_coffee,
+                                          @RequestParam(name = "name") String name,
+                                          @RequestParam(name = "price") Integer price,
+                                          @RequestParam(name = "desc") String description,
+                                          @RequestParam(name = "image64") MultipartFile image64) {
+        try {
+            CoffeeEntity updatedCoffee = new CoffeeEntity();
+            updatedCoffee.setName(name);
+            updatedCoffee.setPrice(price);
+            updatedCoffee.setDescription(description);
+            updatedCoffee.setImage64(Base64.getEncoder().encodeToString(image64.getBytes()));
+
+            Optional<CoffeeEntity> results = coffeeService.updateCoffee(id_coffee, updatedCoffee);
+            return ResponseEntity.ok(Boolean.TRUE);
+        } catch (Exception e) {
+            return ResponseEntity.status(404).build();
         }
     }
 
     //Eliminar un café por ID
-    @DeleteMapping("/deleteCoffee")
-    public ResponseEntity<?> deleteCoffee(@RequestParam(name = "idCoffee") int idCoffee) {
-        if (coffeeRepository.existsById(idCoffee)) {
-            coffeeRepository.deleteById(idCoffee);
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Café eliminado");
-            return ResponseEntity.ok(response);
-        } else {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Café no encontrado");
-            return ResponseEntity.status(404).body(response);
+    @DeleteMapping("/coffee/deleteCoffee")
+    public ResponseEntity<?> deleteCoffee(@RequestParam(name = "id_coffee") int id_coffee) {
+        try {
+            boolean deleted = coffeeService.deleteCoffeeById(id_coffee);
+            if (deleted) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.status(404).build();
+            }
+        } catch (Exception e){
+            return ResponseEntity.status(404).build();
         }
     }
 }

@@ -28,6 +28,7 @@ public class CoffeeEntity {
     private int price;
 
     @Lob
+    @Column(name = "image64", nullable = false, columnDefinition = "LONGTEXT")
     private  String image64;
 
     @OneToMany(mappedBy = "coffee", fetch = FetchType.EAGER)

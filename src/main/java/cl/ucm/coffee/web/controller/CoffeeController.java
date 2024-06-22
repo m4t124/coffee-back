@@ -25,25 +25,23 @@ public class CoffeeController {
             List<CoffeeEntity> coffees = coffeeService.findByName(name);
             return ResponseEntity.ok(coffees);
         } catch (Exception e) {
-            return ResponseEntity.status(404).build();
+            return ResponseEntity.status(500).body("Error al encontrar café por nombre: " + e.getMessage());
         }
     }
 
     //Listar todos los cafés
     @GetMapping("/list")
     public ResponseEntity<List<CoffeeEntity>> coffeeList() {
-        List<CoffeeEntity> coffees = coffeeService.coffeeList();
-        return ResponseEntity.ok(coffees);
+        try {
+            List<CoffeeEntity> coffees = coffeeService.coffeeList();
+            return ResponseEntity.ok(coffees);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Collections.emptyList());
+        }
     }
 
-    //@PostMapping("/save")
-    //public ResponseEntity<CoffeeEntity> saveCoffee(@RequestBody CoffeeEntity coffeeEntity) {
-        //CoffeeEntity savedCoffee = coffeeService.saveCoffee(coffeeEntity);
-        //return ResponseEntity.ok(savedCoffee);
-    //}
-
     @PostMapping("/coffees")
-    public ResponseEntity<?> saveCoffees(@RequestParam(name="name") String name,
+    public ResponseEntity<?> saveCoffees(@RequestParam(name = "name") String name,
                                          @RequestParam(name = "price") Integer price,
                                          @RequestParam(name = "desc") String description,
                                          @RequestParam(name = "image64") MultipartFile image64){
@@ -57,44 +55,46 @@ public class CoffeeController {
             CoffeeEntity savedCoffee = coffeeService.saveCoffee(coffeeEntity);
             return ResponseEntity.ok(savedCoffee);
         } catch (Exception e) {
-            return ResponseEntity.status(404).build();
+            return ResponseEntity.status(500).body("Error al guardar café: " + e.getMessage());
         }
     }
 
     //Actualizar un café
     @PutMapping("/coffee/updateCoffee")
-    public ResponseEntity<?> updateCoffee(@RequestParam(name = "id_coffee") Integer id_coffee,
+    public ResponseEntity<?> updateCoffee(@RequestParam(name = "id_coffee") Integer idCoffee,
                                           @RequestParam(name = "name") String name,
                                           @RequestParam(name = "price") Integer price,
                                           @RequestParam(name = "desc") String description,
                                           @RequestParam(name = "image64") MultipartFile image64) {
         try {
             CoffeeEntity updatedCoffee = new CoffeeEntity();
+            updatedCoffee.setIdCoffee(idCoffee);
             updatedCoffee.setName(name);
             updatedCoffee.setPrice(price);
             updatedCoffee.setDescription(description);
             updatedCoffee.setImage64(Base64.getEncoder().encodeToString(image64.getBytes()));
 
-            Optional<CoffeeEntity> results = coffeeService.updateCoffee(id_coffee, updatedCoffee);
-            return ResponseEntity.ok(Boolean.TRUE);
+            Optional<CoffeeEntity> results = coffeeService.updateCoffee(idCoffee, updatedCoffee);
+            return ResponseEntity.ok(results.isPresent() ? results.get() : "No se encontró el café");
         } catch (Exception e) {
-            return ResponseEntity.status(404).build();
+            return ResponseEntity.status(500).body("Error al actualizar el café: " + e.getMessage());
         }
     }
 
     //Eliminar un café por ID
     @DeleteMapping("/coffee/deleteCoffee")
-    public ResponseEntity<?> deleteCoffee(@RequestParam(name = "id_coffee") int id_coffee) {
+    public ResponseEntity<?> deleteCoffee(@RequestParam(name = "id_coffee") int idCoffee) {
         try {
-            boolean deleted = coffeeService.deleteCoffeeById(id_coffee);
+            boolean deleted = coffeeService.deleteCoffeeById(idCoffee);
             if (deleted) {
                 return ResponseEntity.ok().build();
             } else {
-                return ResponseEntity.status(404).build();
+                return ResponseEntity.status(404).body("Café no encontrado");
             }
         } catch (Exception e){
-            return ResponseEntity.status(404).build();
+            return ResponseEntity.status(500).body("Error al eliminar el café: " + e.getMessage());
         }
     }
 }
+
 

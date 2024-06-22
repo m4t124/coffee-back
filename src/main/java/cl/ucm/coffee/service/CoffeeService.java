@@ -4,6 +4,7 @@ import cl.ucm.coffee.persitence.entity.CoffeeEntity;
 import cl.ucm.coffee.persitence.repository.CoffeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,37 +21,56 @@ public class CoffeeService implements ICoffeeService {
     }
 
     @Override
+    @Transactional
     public CoffeeEntity saveCoffee(CoffeeEntity coffeeEntity) {
-        return coffeeRepository.save(coffeeEntity);
+        try {
+            return coffeeRepository.save(coffeeEntity);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al guardar café: " + e.getMessage());
+        }
     }
 
     @Override
     public List<CoffeeEntity> findByName(String name) {
-        return coffeeRepository.findByName(name);
+        try {
+            return coffeeRepository.findByName(name);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al encontrar café por nombre: " + e.getMessage());
+        }
     }
 
     @Override
-    public boolean deleteCoffeeById(Integer coffeeId) {
-        Optional<CoffeeEntity> coffeeEntity = coffeeRepository.findById(coffeeId);
-        if(coffeeEntity.isPresent()){
-            coffeeRepository.deleteById(coffeeId);
-            return true;
-        }else {
+    @Transactional
+    public boolean deleteCoffeeById(Integer idCoffee) {
+        Optional<CoffeeEntity> coffeeEntity = coffeeRepository.findById(idCoffee);
+        if (coffeeEntity.isPresent()) {
+            try {
+                coffeeRepository.deleteById(idCoffee);
+                return true;
+            } catch (Exception e) {
+                throw new RuntimeException("Error al eliminar el café: " + e.getMessage());
+            }
+        } else {
             return false;
         }
     }
 
     @Override
-    public Optional<CoffeeEntity> updateCoffee(Integer coffeeId, CoffeeEntity updateCoffee) {
-        Optional<CoffeeEntity> existCoffee = coffeeRepository.findById(coffeeId);
+    @Transactional
+    public Optional<CoffeeEntity> updateCoffee(Integer idCoffee, CoffeeEntity updatedCoffee) {
+        Optional<CoffeeEntity> existCoffee = coffeeRepository.findById(idCoffee);
         if (existCoffee.isPresent()) {
-            CoffeeEntity coffeeEntity = existCoffee.get();
-            coffeeEntity.setName(updateCoffee.getName());
-            coffeeEntity.setPrice(updateCoffee.getPrice());
-            coffeeEntity.setDescription(updateCoffee.getDescription());
-            coffeeEntity.setImage64(updateCoffee.getImage64());
-            return Optional.of(coffeeRepository.save(coffeeEntity));
-        }else {
+            try {
+                CoffeeEntity coffeeEntity = existCoffee.get();
+                coffeeEntity.setName(updatedCoffee.getName());
+                coffeeEntity.setPrice(updatedCoffee.getPrice());
+                coffeeEntity.setDescription(updatedCoffee.getDescription());
+                coffeeEntity.setImage64(updatedCoffee.getImage64());
+                return Optional.of(coffeeRepository.save(coffeeEntity));
+            } catch (Exception e) {
+                throw new RuntimeException("Error al actualizar el café: " + e.getMessage());
+            }
+        } else {
             return Optional.empty();
         }
     }

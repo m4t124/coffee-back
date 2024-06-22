@@ -21,7 +21,7 @@ public class CoffeeEntity {
     @Column(nullable = false, length = 30)
     private String name;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 100)
     private String description;
 
     @Column(nullable = false)

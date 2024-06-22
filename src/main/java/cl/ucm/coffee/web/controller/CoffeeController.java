@@ -1,9 +1,7 @@
 package cl.ucm.coffee.web.controller;
 
 import cl.ucm.coffee.persitence.entity.CoffeeEntity;
-import cl.ucm.coffee.service.CoffeeService;
 import cl.ucm.coffee.service.ICoffeeService;
-import com.fasterxml.jackson.databind.ser.Serializers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +12,9 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/coffee")
 public class CoffeeController {
-
     @Autowired
     private ICoffeeService coffeeService;
 
-    //Buscar café
     @GetMapping("/search")
     public ResponseEntity<?> findByName(@RequestParam(name = "name") String name){
         try {
@@ -29,7 +25,6 @@ public class CoffeeController {
         }
     }
 
-    //Listar todos los cafés
     @GetMapping("/list")
     public ResponseEntity<List<CoffeeEntity>> coffeeList() {
         try {
@@ -59,8 +54,7 @@ public class CoffeeController {
         }
     }
 
-    //Actualizar un café
-    @PutMapping("/coffee/updateCoffee")
+    @PutMapping("/updateCoffee")
     public ResponseEntity<?> updateCoffee(@RequestParam(name = "id_coffee") Integer idCoffee,
                                           @RequestParam(name = "name") String name,
                                           @RequestParam(name = "price") Integer price,
@@ -81,8 +75,7 @@ public class CoffeeController {
         }
     }
 
-    //Eliminar un café por ID
-    @DeleteMapping("/coffee/deleteCoffee")
+    @DeleteMapping("/deleteCoffee")
     public ResponseEntity<?> deleteCoffee(@RequestParam(name = "id_coffee") int idCoffee) {
         try {
             boolean deleted = coffeeService.deleteCoffeeById(idCoffee);
@@ -96,5 +89,3 @@ public class CoffeeController {
         }
     }
 }
-
-

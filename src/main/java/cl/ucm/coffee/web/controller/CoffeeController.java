@@ -45,7 +45,7 @@ public class CoffeeController {
             coffeeEntity.setName(name);
             coffeeEntity.setPrice(price);
             coffeeEntity.setDescription(description);
-            coffeeEntity.setImage64(Base64.getEncoder().encodeToString(image64.getBytes()));
+            coffeeEntity.setImage64(image64.getBytes());
 
             CoffeeEntity savedCoffee = coffeeService.saveCoffee(coffeeEntity);
             return ResponseEntity.ok(savedCoffee);
@@ -66,7 +66,7 @@ public class CoffeeController {
             updatedCoffee.setName(name);
             updatedCoffee.setPrice(price);
             updatedCoffee.setDescription(description);
-            updatedCoffee.setImage64(Base64.getEncoder().encodeToString(image64.getBytes()));
+            updatedCoffee.setImage64(image64.getBytes());
 
             Optional<CoffeeEntity> results = coffeeService.updateCoffee(idCoffee, updatedCoffee);
             return ResponseEntity.ok(results.isPresent() ? results.get() : "No se encontró el café");

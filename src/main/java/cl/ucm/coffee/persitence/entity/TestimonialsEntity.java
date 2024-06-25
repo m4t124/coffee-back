@@ -14,27 +14,22 @@ public class TestimonialsEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_testimonial", nullable = false)
-    private int idTestimonials;
+    private int idTestimonial;
 
-    @Column(nullable = false, length = 50)
+    @Column(name = "username", nullable = false, length = 50)
     private String username;
 
     @Column(nullable = false, length = 200)
     private String testimonial;
 
-    @Column(name="id_coffee", nullable = false, length = 30)
+    @Column(name = "id_coffee", nullable = false)
     private int idCoffee;
-
-
-
 
     @ManyToOne
     @JoinColumn(name = "id_coffee", referencedColumnName = "id_coffee", insertable = false, updatable = false)
     private CoffeeEntity coffee;
 
     @ManyToOne
-    @JoinColumn(name = "username", referencedColumnName = "username",  insertable = false, updatable = false)
+    @JoinColumn(name = "username", referencedColumnName = "username", insertable = false, updatable = false)
     private UserEntity user;
-
-
 }

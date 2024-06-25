@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface TestimonialsRepository extends JpaRepository<TestimonialsEntity, Integer> {
-    List<TestimonialsEntity> findByIdCoffee(int idCoffee);
+    List<TestimonialsEntity> findByIdCoffee(int coffeeId);
 }

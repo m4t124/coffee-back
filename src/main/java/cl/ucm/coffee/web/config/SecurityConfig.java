@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
+
     @Autowired
     private JwtFilter jwtFilter;
 
@@ -33,6 +34,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/coffee/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/coffee/updateCoffee").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/coffee/deleteCoffee").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/testimonials/create").hasRole("CLIENT")
+                .requestMatchers(HttpMethod.GET, "/api/testimonials/findByCoffeeId").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

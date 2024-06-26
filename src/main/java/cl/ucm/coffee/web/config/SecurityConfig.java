@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/coffee/deleteCoffee").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/testimonials/create").hasRole("CLIENT")
                 .requestMatchers(HttpMethod.GET, "/api/testimonials/findByCoffeeId").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/create").hasRole("CLIENT")
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

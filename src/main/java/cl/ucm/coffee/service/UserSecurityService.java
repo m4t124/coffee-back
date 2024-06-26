@@ -18,12 +18,19 @@ import java.util.List;
 @Service
 public class UserSecurityService implements UserDetailsService {
     @Autowired
-    private UserRepository userRepository;
+    private  UserRepository userRepository;
+
+//    @Autowired
+//    public UserSecurityService(UserRepository userRepository) {
+//        this.userRepository = userRepository;
+//    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity userEntity = this.userRepository.findById(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found."));
+
+        System.out.println(userEntity);
 
         String[] roles = userEntity.getRoles().stream().map(UserRoleEntity::getRole).toArray(String[]::new);
 
@@ -32,15 +39,28 @@ public class UserSecurityService implements UserDetailsService {
                 .password(userEntity.getPassword())
                 .authorities(this.grantedAuthorities(roles))
                 .accountLocked(userEntity.getLocked())
+
                 .disabled(userEntity.getDisabled())
                 .build();
+    }
+
+    private String[] getAuthorities(String role) {
+        if ("ADMIN".equals(role) || "CLIENT".equals(role)) {
+            return new String[] {"random_order"};
+        }
+
+        return new String[] {};
     }
 
     private List<GrantedAuthority> grantedAuthorities(String[] roles) {
         List<GrantedAuthority> authorities = new ArrayList<>(roles.length);
 
-        for (String role : roles) {
+        for (String role: roles) {
             authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+
+            for (String authority: this.getAuthorities(role)) {
+                authorities.add(new SimpleGrantedAuthority(authority));
+            }
         }
 
         return authorities;

@@ -39,4 +39,11 @@ public class JwtUtil {
                 .verify(jwt)
                 .getSubject();
     }
+
+    public Date getIssuedAt(String jwt) {
+        return JWT.require(ALGORITHM)
+                .build()
+                .verify(jwt)
+                .getIssuedAt();
+    }
 }

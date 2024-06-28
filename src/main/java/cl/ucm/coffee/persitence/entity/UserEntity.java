@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -33,6 +34,9 @@ public class UserEntity {
     @Column(nullable = false, columnDefinition = "TINYINT")
     private Boolean disabled;
 
+    @Column(name = "logout_time")
+    private LocalDateTime logoutTime;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<UserRoleEntity> roles;
 
@@ -48,6 +52,7 @@ public class UserEntity {
                 ", email='" + email + '\'' +
                 ", locked=" + locked +
                 ", disabled=" + disabled +
+                ", logoutTime=" + logoutTime +
                 ", roles=" + roles +
                 '}';
     }

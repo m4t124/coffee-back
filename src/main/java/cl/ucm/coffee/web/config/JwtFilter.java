@@ -1,5 +1,7 @@
 package cl.ucm.coffee.web.config;
 
+import cl.ucm.coffee.persitence.entity.UserEntity;
+import cl.ucm.coffee.persitence.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +17,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Optional;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -22,6 +27,8 @@ public class JwtFilter extends OncePerRequestFilter {
     private JwtUtil jwtUtil;
     @Autowired
     private UserDetailsService userDetailsService;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -40,6 +47,20 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         String username = this.jwtUtil.getUsername(jwt);
+        Optional<UserEntity> userEntityOptional = userRepository.findById(username);
+        if (userEntityOptional.isEmpty()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        UserEntity userEntity = userEntityOptional.get();
+        LocalDateTime logoutTime = userEntity.getLogoutTime();
+
+        if (logoutTime != null && jwtUtil.getIssuedAt(jwt).toInstant().isBefore(logoutTime.atZone(ZoneId.systemDefault()).toInstant())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         User user = (User) this.userDetailsService.loadUserByUsername(username);
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(

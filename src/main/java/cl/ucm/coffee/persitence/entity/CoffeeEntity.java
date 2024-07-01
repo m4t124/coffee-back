@@ -30,8 +30,8 @@ public class CoffeeEntity {
     @Lob
     private byte[] image64;
 
-    @OneToMany(mappedBy = "coffee", fetch = FetchType.EAGER)
-    private List<TestimonialsEntity> testimonials;
+    //@OneToMany(mappedBy = "coffee", fetch = FetchType.EAGER)
+    //private List<TestimonialsEntity> testimonials;
 
 
 }

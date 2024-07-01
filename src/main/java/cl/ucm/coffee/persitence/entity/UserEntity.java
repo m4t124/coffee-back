@@ -40,8 +40,8 @@ public class UserEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<UserRoleEntity> roles;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private List<TestimonialsEntity> testimonials;
+    //@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    //private List<TestimonialsEntity> testimonials;
 
 
     @Override

@@ -4,6 +4,7 @@ import cl.ucm.coffee.service.dto.LoginDto;
 import cl.ucm.coffee.service.dto.UserDto;
 import cl.ucm.coffee.web.config.JwtUtil;
 import cl.ucm.coffee.persitence.entity.UserEntity;
+import cl.ucm.coffee.persitence.entity.UserRoleEntity;
 import cl.ucm.coffee.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -31,15 +34,17 @@ public class AuthController {
         UsernamePasswordAuthenticationToken login = new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
         Authentication authentication = this.authenticationManager.authenticate(login);
 
-        String jwt = this.jwtUtil.create(loginDto.getUsername());
+        UserEntity userEntity = userService.findByUsername(loginDto.getUsername());
+        List<String> roles = userEntity.getRoles().stream().map(UserRoleEntity::getRole).collect(Collectors.toList());
+
+        String jwt = this.jwtUtil.create(loginDto.getUsername(), roles);
         Map<String, String> map = new HashMap<>();
         map.put("token", jwt);
 
         // Restablecer el campo logout_time a NULL cuando el usuario inicia sesión
-        UserEntity user = userService.findByUsername(loginDto.getUsername());
-        if (user != null) {
-            user.setLogoutTime(null);
-            userService.saveUser(user);
+        if (userEntity != null) {
+            userEntity.setLogoutTime(null);
+            userService.saveUser(userEntity);
         }
 
         return ResponseEntity.ok(map);

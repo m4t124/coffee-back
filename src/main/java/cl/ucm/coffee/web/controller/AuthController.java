@@ -14,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class AuthController {
         Map<String, String> map = new HashMap<>();
         map.put("token", jwt);
 
-        // Restablecer el campo logout_time a NULL cuando el usuario inicia sesión
+        //Restablece el campo "logout_time" a Null cuando el cliente o admin inicia sesión
         if (userEntity != null) {
             userEntity.setLogoutTime(null);
             userService.saveUser(userEntity);
@@ -55,7 +56,7 @@ public class AuthController {
         if (userService.existsByUsername(userDto.getUsername())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Usuario ya existe");
         }
-        userDto.setRole("CLIENT"); // Asigna el rol por defecto como CLIENT
+        userDto.setRole(Collections.singletonList("CLIENT")); // Asigna el rol por defecto como CLIENT
         UserDto createdUser = userService.createUser(userDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
@@ -88,4 +89,12 @@ public class AuthController {
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token inválido");
     }
+
+    @GetMapping("/clientes")
+    public ResponseEntity<List<UserDto>> getClients() {
+        List<UserDto> clients = userService.getAllClients();
+        return ResponseEntity.ok(clients);
+    }
+
+
 }

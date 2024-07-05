@@ -15,8 +15,7 @@ public class TestimonialsController {
     @Autowired
     private ITestimonialsService testimonialsService;
 
-    // Endpoint para crear un testimonio
-    @PostMapping("/create")
+    @PostMapping("/create") //Crear testimonio
     public ResponseEntity<?> create(@RequestBody TestimonialsEntity testimonial) {
         try {
             TestimonialsEntity createdTestimonial = testimonialsService.createTestimonial(testimonial);
@@ -26,8 +25,7 @@ public class TestimonialsController {
         }
     }
 
-    // Endpoint para obtener testimonios por ID de café
-    @GetMapping("/findByCoffeeId")
+    @GetMapping("/findByCoffeeId") //Obtener testimonios por ID de café
     public ResponseEntity<?> findByCoffeeId(@RequestParam(name = "coffeeId") int coffeeId) {
         try {
             List<TestimonialsEntity> testimonials = testimonialsService.findByCoffeeId(coffeeId);

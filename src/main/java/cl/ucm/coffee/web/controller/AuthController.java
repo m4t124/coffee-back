@@ -30,7 +30,7 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/login")
+    @PostMapping("/login") //Iniciar sesión
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
         UsernamePasswordAuthenticationToken login = new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
         Authentication authentication = this.authenticationManager.authenticate(login);
@@ -51,7 +51,7 @@ public class AuthController {
         return ResponseEntity.ok(map);
     }
 
-    @PostMapping("/create")
+    @PostMapping("/create") //Crear cuenta
     public ResponseEntity<?> create(@RequestBody UserDto userDto) {
         if (userService.existsByUsername(userDto.getUsername())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Usuario ya existe");
@@ -61,25 +61,25 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
-    @PutMapping("/update")
+    @PutMapping("/update") //Actualizar cuenta
     public ResponseEntity<?> updateUser(@RequestBody UserDto userDto) {
         UserDto updatedUser = userService.updateUser(userDto);
         return ResponseEntity.ok(updatedUser);
     }
 
-    @PutMapping("/lock")
+    @PutMapping("/lock") //Bloquear usuario
     public ResponseEntity<?> lockUser(@RequestParam String username) {
         userService.lockUser(username);
         return ResponseEntity.ok("Usuario bloqueado");
     }
 
-    @PutMapping("/unlock")
+    @PutMapping("/unlock") //Desbloquear usuario
     public ResponseEntity<?> unlockUser(@RequestParam String username) {
         userService.unlockUser(username);
         return ResponseEntity.ok("Usuario desbloqueado");
     }
 
-    @PostMapping("/logout")
+    @PostMapping("/logout") //Cerrar sesión
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
         if (token != null && token.startsWith("Bearer ")) {
             String jwt = token.substring(7);
@@ -90,7 +90,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token inválido");
     }
 
-    @GetMapping("/clientes")
+    @GetMapping("/clientes") //Lista de clientes
     public ResponseEntity<List<UserDto>> getClients() {
         List<UserDto> clients = userService.getAllClients();
         return ResponseEntity.ok(clients);

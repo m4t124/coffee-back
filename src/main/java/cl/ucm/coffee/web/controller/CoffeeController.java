@@ -15,7 +15,7 @@ public class CoffeeController {
     @Autowired
     private ICoffeeService coffeeService;
 
-    @GetMapping("/search")
+    @GetMapping("/search") //Busca café
     public ResponseEntity<?> findByName(@RequestParam(name = "name") String name){
         try {
             List<CoffeeEntity> coffees = coffeeService.findByName(name);
@@ -25,7 +25,7 @@ public class CoffeeController {
         }
     }
 
-    @GetMapping("/list")
+    @GetMapping("/list") //Lista de cafés en la base de datos
     public ResponseEntity<List<CoffeeEntity>> coffeeList() {
         try {
             List<CoffeeEntity> coffees = coffeeService.coffeeList();
@@ -35,7 +35,7 @@ public class CoffeeController {
         }
     }
 
-    @PostMapping("/coffees")
+    @PostMapping("/coffees") //Crear café
     public ResponseEntity<?> saveCoffees(@RequestParam(name = "name") String name,
                                          @RequestParam(name = "price") Integer price,
                                          @RequestParam(name = "desc") String description,
@@ -54,7 +54,7 @@ public class CoffeeController {
         }
     }
 
-    @PutMapping("/updateCoffee")
+    @PutMapping("/updateCoffee") //Actualizar café
     public ResponseEntity<?> updateCoffee(@RequestParam(name = "id_coffee") Integer idCoffee,
                                           @RequestParam(name = "name") String name,
                                           @RequestParam(name = "price") Integer price,
@@ -75,7 +75,7 @@ public class CoffeeController {
         }
     }
 
-    @DeleteMapping("/deleteCoffee")
+    @DeleteMapping("/deleteCoffee") //Eliminar café
     public ResponseEntity<?> deleteCoffee(@RequestParam(name = "id_coffee") int idCoffee) {
         try {
             boolean deleted = coffeeService.deleteCoffeeById(idCoffee);
